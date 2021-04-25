@@ -1,0 +1,214 @@
+---
+title: "Health Care Management Exploration v2"
+author: "Faizan Khalid Mohsin"
+date: "February 13, 2018"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+#install.packages("kableExtra")
+require("knitr")
+require("dplyr")
+require("ggplot2")
+require("kableExtra")
+```
+
+
+####Use the data for five countries (Canada, US, UK plus 2 others you choose) to compare trends and the current situation in these health systems. Please prepare a report using tables/charts.
+
+```{r Importing Life Expectancy data, echo=FALSE}
+
+## Sourcing the Functions Script
+source("Functions_Health_Management.R")
+
+```
+
+
+####On trend charts, use 1985 to the latest year available (except where noted), but label in five year increments (85, 90 etc, 2000, 05, 10, 15 or whatever the latest is; otherwise the x axis will be unreadable). In the most recent charts, indicate the most recent data date (e.g. 2016, except where noted) and using notes (superscript numbers, indicate the other years.) Line graphs work better for trends over time. Bar graphs are typically used when comparing variables by different groups (e.g. countries).
+
+#####Questions: 
+
+a. Demographics:
+      i. Figure. Life expectancy at birth, for all. Trend (for this go back to 1970)
+      
+```{r Life Expectancy, echo=FALSE}
+
+## Importing the data
+Life_expectancy_data <- read.csv("Life_Expectany_trend_data.csv", header = TRUE)
+LE = select(Life_expectancy_data, Country, Year, Value)
+LE_data = filter(LE, Year >= 1970)
+#str(LE_data)
+
+# Plotting a Dotted trend graph:
+ggplot(LE_data, aes(x = Year, y = Value, color = Country)) + geom_point() + ggtitle("Life Expectancy at Birth Graph with points version")
+
+# Plotting trend lines:
+graph_trendlines(LE_data, "Life Expectancy at Birth Graph", "Age (years)")
+
+```
+
+a. Demographics:
+      ii. Figure. Share of population age 65 or more. Trend (go back to 1980)
+      
+```{r, echo=FALSE}
+
+# Import and clean the data:
+Per_65_rawdata = read.csv("Per_65_Data.csv")
+Per_65_data = filter(Per_65_rawdata[, c("Country", "Year", "Value")], Year>=1980)
+
+graph_trendlines(Per_65_data, "Percentage of Population Greater than 65 years", "Percentage of Population greater than 65 years (%)")
+
+# ggplot(Per_65_data, aes(x = Year, y = Value, color = Country)) + geom_line() + ggtitle("Percentage of Population Greater than 65 years") + labs(y = "Percentage of Population greater than 65 years (%)")  # + theme(legend.position="bottomright")
+
+```
+
+a. Demographics:
+      iii. Table Current situation. Life expectancy for all, female, male. Infant mortality.
+      
+```{r, echo = FALSE}
+
+# Import and Clean the data:
+LE_current_rawdata = read.csv("Current_Life_Expectancy_data.csv")
+LE_current_data = select(LE_current_rawdata, Country, Variable, Year, Value)
+
+# First we will make a table:
+LE_currenct_data_wide_form = reshape(select(LE_current_data, -Year), idvar = "Country", timevar = "Variable", direction = "wide")
+colnames(LE_currenct_data_wide_form) = c("Country", "Females", "Males", "Total Population")
+kable(LE_currenct_data_wide_form, caption = "Life Expectancy at Birth by Country and Gender.", align = c("l", "c", "c", "c"))
+```
+
+Now we will present the data in the table as a graph. 
+
+```{r echo = FALSE}
+# Now we will graph the table in terms of a bar plot: We are missing Canada
+
+ggplot(data = LE_current_data, aes(x=Variable, y=Value, fill=Country)) +
+geom_bar(stat="identity", position=position_dodge()) + geom_text(aes(label=Value), vjust=1.6, color="white", position = position_dodge(0.9), size=3.5) + ggtitle("Comparing Current Life Expectancy at Birth over Sex and Countries.")+ labs(x = "", y = "Age (years)")
+
+
+```
+
+a. Demographics:
+      iV. Table. Risk factors – BMI (all), smoking. Current situation.
+      
+```{r, echo=FALSE, results = 'asis'}
+
+#### RISK FACTOR: BMI (Could only find: obese or overweight measured, as the losest var)
+
+# Import and clean the data:
+#rawdata = read.csv()
+
+
+#### RISK FACTOR: SMOKING:
+# First we import and clean the data:
+smoking_current_rawdata = read.csv("Current_Smoking_data.csv")
+smoking_current_data = select(smoking_current_rawdata, Country, Year, Value)
+smoking_current_data_2013 = rename(filter(smoking_current_data, Year == 2013), "% of population aged 15+ who are daily smokers" = Value)
+smoking_current_data_2013_final = select(smoking_current_data_2013, -Year)
+
+# We shall make the table of this:
+kable(smoking_current_data_2013_final, caption = "Percentage of Population aged 15+ Who are Daily Smokers for the Year 2013", align = c("l", "c"))
+
+#kable(smoking_current_data_2013_final, "html") %>% kable_styling(bootstrap_options = "striped", full_width = F)
+
+# Represent this in a bar graph:
+#ggplot(data=LE_current_data, aes(x=Variable, y=Value, fill=Country)) + geom_bar(stat="identity", position=position_dodge()) + geom_text(aes(label=Value), vjust=1.6, color="white", position = position_dodge(0.9), size=3.5) + ggtitle("Current Life Expectation For Male, Female, and Total Population at Birth of \n different Countries")+ labs(y = "Age (years)")
+
+```
+
+  
+b. Expenditure & finance:
+      i. Figure. Total health expenditure as share of GDP (trend, from 1985).
+      
+```{r, echo = FALSE}
+# Import and clean data:
+HealthCare_exp_rawdata=read.csv("HealthCare_Exp_data.csv")
+HealthCare_exp_data = select(HealthCare_exp_rawdata, Country, Year, Value)
+
+# Graph trend lines:
+graph_trendlines(HealthCare_exp_data, "Health Care Expenditure as Share of GDP since 1985", "Percentage Share of GDP")
+
+# ggplot(HealthCare_exp_data, aes(x = Year, y = Value, color = Country)) + geom_line() + ggtitle("Health Care Expenditure as Share of GDP from 1985") + labs(y = "Percentage Share of GDP ")
+
+```
+
+
+      ii. Figure. Bar graph. Total health expenditure as share of GDP, current situation.
+      
+```{r, echo = FALSE}
+
+# Import and clean the data:
+HealthCare_current_data = filter(HealthCare_exp_data, Year == 2015) %>% mutate(ValueR = round(Value, 1))
+
+# Now Create the simple bar plot with only comparisons between Countries:
+ggplot(data=HealthCare_current_data, aes(x=Country, y=Value, fill=Country)) + geom_bar(stat="identity") + geom_text(aes(label=ValueR), vjust=1.6, color="white", size=3.5) + ggtitle("Health Care Expenditure as Share of GDP for 2015")+ labs(y = "Percentage Share of GDP")
+
+                                                                                  
+```
+
+      iii. Figure. Public expenditure as share of total health expenditure Trend
+      
+      
+```{r}
+
+```
+
+
+      iv. Figure. Spending on drugs. (Bar graph)
+      
+      
+```{r, echo= FALSE}
+
+# Import and clean data, Note we are using total pharmaceutical sales as "Spending on drugs"
+Pharma_Sales_rawdata = read.csv("Total_Pharma_Sales_data.csv")
+Total_Pharma_Sales_data = select(Pharma_Sales_rawdata, Country, Year, Value) %>% filter(Year == 2015) # 2015 is the latest most complete year with only US mississing. 
+
+# Creating the simple bar graph with only the countries as comparisons: 
+ggplot(data=Total_Pharma_Sales_data, aes(x=Country, y=Value, fill=Country)) + geom_bar(stat="identity") + geom_text(aes(label=Value), vjust=1.6, color="white", size=3.5) + ggtitle("Total Pharmaceutical Sales in 2015 as Per Capita  in US$")+ labs(y = "Dollars ($)")
+
+
+```
+
+  
+  
+c. Resources and use:
+      i. Table. Current situation. Number of doctors, nurses, MRI units, hospital beds per person. (latest data).
+      
+
+      
+      ii. Figure. Number of hospital beds per 1000. Trend
+      
+      
+```{r, echo=FALSE}
+
+# Import and clean the data:
+Beds_per1000_rawdata = read.csv("Beds_per1000_data.csv")
+Beds_per1000_data = select(Beds_per1000_rawdata, Country, Year, Value)
+
+# Graph trend lines:
+graph_trendlines(Beds_per1000_data,"Number of hospital beds per 1000 of the Population since 1985", "Number of hospital beds per 1000 of the Population" )
+
+# ggplot(Beds_per1000_rawdata, aes(x = Year, y = Value, color = Country)) + geom_line() + ggtitle("Number of hospital beds per 1000 of the Population since 1985") + labs(y = "Number of hospital beds per 1000 of the Population")
+
+```
+
+
+      iii. Figure. Average length of stay (all causes). Trend.
+      
+```{r}
+
+# Import and clean the data:
+Wait_time_rawdata= read.csv("Average_Wait_time_trend_data.csv")
+Wait_time_data_1 = select(Wait_time_rawdata, Country, Year, Value) #Selecting relevant columns
+str(Wait_time_data_1) # Checking if everything looks ok.
+
+graph_trendlines(Wait_time_data_1,"Average Length of Stay (all Causes) since 1985", "Days" )
+
+
+```
+
+  
+(You can try to put ii and iii on the same graph. If you can’t do it, don’t worry because it is complicated).
+Make sure the figures are legible, the Y axis labelled (you don’t need to label “year” or “country” on the X axis, the labels for the years and countries are sufficient.). Also sure the same colours/patterns are used for each country for each figure. Tables can be as in the examples. Every table requires a source (E.g. Source: OECD, 2017), and the reference at the end of the assignment.
+

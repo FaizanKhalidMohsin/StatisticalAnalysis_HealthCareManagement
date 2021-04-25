@@ -1,0 +1,160 @@
+---
+title: "Assignment 3 and 4 HealthCare Management Ryerson"
+author: "Faizan Khalid Mohsin"
+date: "March 6, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Assignment 3. Data description and t-tests (10%, split evenly between a. and b.)
+a. Use the GE data.
+Compare, using t-tests, the ages and BMI of the sample by gender.
+
+```{r}
+
+data_GE = read.csv("GE data W 2018 .csv") # YEs, there is a space in the name. 
+str(data_GE)
+
+males_age = subset(data_GE, gender=="Male", age)
+females_age = subset(data_GE, gender=="Female", age)
+
+t.test(males_age, females_age)
+
+males_BMI = subset(data_GE, gender=="Male", bmi)
+females_BMI = subset(data_GE, gender=="Female", bmi)
+
+t.test(males_BMI, females_BMI)
+
+```
+
+b. Use the California Hospital data.
+
+
+i. Compare hospital size (number of beds) by type of control (Use groups from Assignment 1)
+
+```{r}
+data_California = read.csv("California hospital data W 2018.csv")
+
+
+```
+
+
+ii. Compare, using ANOVA, the average discharges, average total revenues and average number of physicians, by hospital size categories (use number of beds for size, 4 categories).
+
+```{r}
+fit <- aov(y ~ A, data=data_California)
+summary(fit)
+```
+
+iii. Compare nurse (regular) and administrative salaries by hospital size categories.
+
+```{r}
+
+subset(data,hosp_size_cat ==asfa , c("nurse_reg", "admin_salary") )
+
+x = c(1.2, 3.2, 4.1, 1)
+sd(x)^2
+Y = cbind()
+manova(Y ~ hosp_size_cat, data = data_California)
+
+```
+
+
+iv. Compare mortality rates for stroke and AMI by hospital size categories.
+
+
+```{r }
+
+
+
+```
+
+## Assignment 4:
+
+
+Assignment 4. Regression & correlation (15%)
+a. Use the GE data
+i.  Make a correlation table using the variables stroke, chd, diabetes, BMI, age, gender and smoking. Note you will need to make dummy variables to do this. 
+
+```{r}
+
+require(corrplot)
+require(dplyr)
+require(dummies)
+library(Hmisc)
+
+data_GE$smoking=as.character(data_GE$smoking)
+data_GE$smoking[data_GE$smoking==""] = NA
+data_GE$smoking=as.factor(data_GE$smoking)
+str(data_GE)
+GE = select(data_GE, stroke, chd, diab, bmi, age, gender, smoking )
+dput(names(GE))
+str(GE)
+
+dat <- dummy.data.frame(GE)
+which.dummy(dat)
+cor(dat, use="pairwise.complete.obs", method="kendall")
+cor(dat, use="pairwise.complete.obs", method="spearman")
+
+# rcorr(dat, type="pearson")
+# M = cor(dat)
+# corrplot(M)
+
+dput(names(dat))
+
+print(c("strokeNo", "strokeYes", "chdNo", "chdYes", "diabNo", "diabYes", 
+"bmi", "age", "genderFemale", "genderMale", "smokingcurrent", 
+"smokingever", "smokingformer", "smokingnever", "smokingnot current", 
+"smokingNA"), quote = F)
+
+print(c("stroke", "chd", "diab", "bmi", "age", "gender", "smoking"), quote = F)
+```
+
+ii.  What factors are associated with the incidence of stroke? Do this with a regression controlling for the different factors.  (use logistic regression – logit)
+
+
+
+```{r}
+
+GE = select(data_GE, stroke, chd, diab, bmi, age, gender, smoking, hypertension )
+
+model2 <- glm(stroke ~  chd   +  diab +  bmi  +  age  +   gender + smoking,family=binomial(link='logit'), data=GE)
+
+summary(model2)
+# 
+# model1 <- glm(stroke ~ chdNo + chdYes+   diabNo    +         diabYes           
+#  + bmi             +   age +               genderFemale      
+# + genderMale  +       smokingcurrent +    smokingever      
+# + smokingformer+      smokingnever  +     smokingnot current
+# + smokingNA, family=binomial(link='logit'), data=dat)
+
+```
+
+
+Iii.  What factors are associated with the incidence of CHD? Do this with a regression controlling for the different factors. What factors are associated with hypertension?
+```{r}
+model3 <- glm(  chd   ~ stroke + diab +  bmi  +  age  +   gender + smoking,family=binomial(link='logit'), data=GE)
+summary(model3)
+
+model4 <- glm( hypertension~  chd   + stroke + diab +  bmi  +  age  +   gender + smoking,family=binomial(link='logit'), data=GE)
+summary(model3)
+
+```
+
+
+b. Use the California Hospital data
+i.  What factors are associated with hospital quality – as measured by mortality rates – associated with treatment for AMI and Stroke?
+
+```{r}
+select(data_California, contains("mortality"))
+
+mortality = select(data_California, contains("rate"))
+
+```
+
+
+
+

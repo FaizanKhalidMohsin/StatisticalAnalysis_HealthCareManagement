@@ -1,0 +1,13 @@
+VAR,Variable,UNIT,Measure,COU,Country,YEA,Year,Value,Flag Codes,Flags
+EVIEFE00,Females at birth,EVIDUREV,Years,AUS,Australia,2015,2015,84.5,,
+EVIEHO00,Males at birth,EVIDUREV,Years,AUS,Australia,2015,2015,80.4,,
+EVIETOTA,Total population at birth,EVIDUREV,Years,AUS,Australia,2015,2015,82.5,,
+EVIEFE00,Females at birth,EVIDUREV,Years,NOR,Norway,2015,2015,84.2,,
+EVIEHO00,Males at birth,EVIDUREV,Years,NOR,Norway,2015,2015,80.5,,
+EVIETOTA,Total population at birth,EVIDUREV,Years,NOR,Norway,2015,2015,82.4,,
+EVIEFE00,Females at birth,EVIDUREV,Years,GBR,United Kingdom,2015,2015,82.8,,
+EVIEHO00,Males at birth,EVIDUREV,Years,GBR,United Kingdom,2015,2015,79.2,,
+EVIETOTA,Total population at birth,EVIDUREV,Years,GBR,United Kingdom,2015,2015,81,,
+EVIEFE00,Females at birth,EVIDUREV,Years,USA,United States,2015,2015,81.2,E,Estimated value
+EVIEHO00,Males at birth,EVIDUREV,Years,USA,United States,2015,2015,76.3,E,Estimated value
+EVIETOTA,Total population at birth,EVIDUREV,Years,USA,United States,2015,2015,78.8,,
